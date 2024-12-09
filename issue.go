@@ -65,6 +65,14 @@ type PartUsage struct {
 	Remark  string `json:"remark"`
 }
 
+type ReportBySummary struct {
+	IssueType     string `json:"issue_type"`
+	Proceeding    int    `json:"proceeding"`
+	WaitForClosed int    `json:"waitforclosed"`
+	Closed        int    `json:"closed"`
+	Cancelled     int    `json:"cancelled"`
+}
+
 type IssueHandler struct {
 	DB *gorm.DB
 }
@@ -332,5 +340,52 @@ func (h *IssueHandler) FindCompleted(c *gin.Context) {
 
 		h.DB.Model(&Issue{}).Preload("Phone").Where("status=3").Find(&issues)
 		c.JSON(http.StatusOK, issues)
+	}
+}
+
+func (h *IssueHandler) FindAllByDate(c *gin.Context) {
+	var t = c.Param("token")
+	var frm = c.Param("frmdate")
+	var to = c.Param("todate")
+
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if claim.Role == 1 || claim.Role == 2 {
+		var issues []Issue
+
+		h.DB.Model(&Issue{}).Preload("Phone").Where("created between ? and ?", frm, to).Find(&issues)
+		c.JSON(http.StatusOK, issues)
+	}
+}
+
+func (h *IssueHandler) SummaryByDate(c *gin.Context) {
+	var t = c.Param("token")
+	var frm = c.Param("frmdate")
+	var to = c.Param("todate")
+	var result []ReportBySummary
+
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if claim.Role == 1 || claim.Role == 2 {
+		var sql = `
+			select 
+				issue_type, 
+				sum(case when status = 1 then  1 else 0 end) as proceeding,
+				sum(case when status = 2 then  1 else 0 end) as waitforclosed,
+				sum(case when status = 3 then  1 else 0 end) as closed,
+				sum(case when status = 0 then  1 else 0 end) as cancelled
+			from issues 
+			where DATE(created) between ? and ?
+			group by issue_type; 
+		`
+
+		h.DB.Raw(sql, frm, to).Scan(&result)
+		c.JSON(http.StatusOK, result)
 	}
 }

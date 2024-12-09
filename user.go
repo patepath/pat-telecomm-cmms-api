@@ -3,7 +3,6 @@ package main
 import (
 	"cmms-api/token"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -54,11 +53,10 @@ func (h *LoginHandler) Login(c *gin.Context) {
 	var username = user.Name
 	var passwordMD5 = user.Password
 
-	fmt.Printf("user: %s, password: %s", username, passwordMD5)
-
 	if h.DB.Where("name=? and password=?", username, passwordMD5).First(&user).RowsAffected == 1 {
 		t, _ := token.GenerateToken(user.Name, user.Position, user.Role)
 		c.JSON(http.StatusOK, gin.H{"fullname": user.FirstName + " " + user.LastName, "position": user.Position, "role": user.Role, "token": t})
+
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 	}

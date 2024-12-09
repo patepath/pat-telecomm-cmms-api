@@ -78,13 +78,22 @@ func main() {
 		issueGroup.GET(("/findbyid/:token/:id"), issue.FindById)
 		issueGroup.GET(("/findtoday/:token"), issue.FindToday)
 		issueGroup.GET(("/findbydate/:token/:frmdate/:todate"), issue.FindByDate)
+		issueGroup.GET(("/findallbydate/:token/:frmdate/:todate"), issue.FindAllByDate)
 		issueGroup.GET(("/findonprocess/:token"), issue.FindOnProcess)
 		issueGroup.GET(("/findwaitforclose/:token"), issue.FindWaitForClose)
 		issueGroup.GET(("/findcompleted/:token"), issue.FindCompleted)
+		issueGroup.GET(("/summarybydate/:token/:frmdate/:todate"), issue.SummaryByDate)
 		issueGroup.POST(("/save/:token/:isattach/:isparts"), issue.Save)
 		issueGroup.GET(("/checkfileattach/:issueno"), issue.CheckFileAttach)
 		issueGroup.POST(("/upload/:token"), issue.Upload)
 		issueGroup.GET(("/download/:issueno/:order"), issue.Download)
+	}
+
+	profile := ProfileHandle{}
+	profilegroup := r.Group("/profile")
+	{
+		profilegroup.GET(("/getone"), profile.GetOne)
+		profilegroup.POST(("/save"), profile.Save)
 	}
 
 	r.Run(":8082")
