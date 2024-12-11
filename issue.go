@@ -274,7 +274,7 @@ func (h *IssueHandler) FindByDate(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("status=3 and created between ? and ?", frm, to).Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("status=1 and created between ? and ?", frm, to).Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
@@ -290,7 +290,7 @@ func (h *IssueHandler) FindToday(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("date(created) = date(now()) and status=1").Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("date(created) = date(now()) and status=0").Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
@@ -306,7 +306,7 @@ func (h *IssueHandler) FindOnProcess(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("status=1").Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("status=0").Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
@@ -338,7 +338,7 @@ func (h *IssueHandler) FindCompleted(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("status=3").Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("status=1").Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }

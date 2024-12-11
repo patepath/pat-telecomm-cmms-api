@@ -18,11 +18,11 @@ type Phone struct {
 	Location string `gorm:"size:255" json:"location"`
 	Hc       string `gorm:"size:30" json:"hc"`
 	Kc       string `gorm:"size:30" json:"kc"`
-	Tc1      string `gorm:"size:15" json:"tc1"`
-	Tc2      string `gorm:"size:15" json:"tc2"`
-	Tc3      string `gorm:"size:15" json:"tc3"`
-	Tc4      string `gorm:"size:15" json:"tc4"`
-	Tc5      string `gorm:"size:15" json:"tc5"`
+	Tc1      string `gorm:"size:255" json:"tc1"`
+	Tc2      string `gorm:"size:255" json:"tc2"`
+	Tc3      string `gorm:"size:255" json:"tc3"`
+	Tc4      string `gorm:"size:255" json:"tc4"`
+	Tc5      string `gorm:"size:255" json:"tc5"`
 }
 
 type PhoneHandler struct {

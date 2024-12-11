@@ -20,7 +20,7 @@ type User struct {
 	Role      uint8     `gorm:"not null" json:"role"`
 	FirstName string    `json:"firstname"`
 	LastName  string    `json:"lastname"`
-	Position  string    `gorm:"size:25;not null" json:"position"`
+	Position  string    `gorm:"size:255;not null" json:"position"`
 	Status    uint8     `gorm:"not null" json:"status"`
 	Modified  time.Time `gorm:"autoUpdateTime" json:"modified"`
 }
