@@ -376,10 +376,10 @@ func (h *IssueHandler) SummaryByDate(c *gin.Context) {
 		var sql = `
 			select 
 				issue_type, 
-				sum(case when status = 1 then  1 else 0 end) as proceeding,
+				sum(case when status = 0 then  1 else 0 end) as proceeding,
+				sum(case when status = 1 then  1 else 0 end) as closed,
 				sum(case when status = 2 then  1 else 0 end) as waitforclosed,
-				sum(case when status = 3 then  1 else 0 end) as closed,
-				sum(case when status = 0 then  1 else 0 end) as cancelled
+				sum(case when status = 99 then  1 else 0 end) as cancelled
 			from issues 
 			where DATE(created) between ? and ?
 			group by issue_type; 
