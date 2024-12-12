@@ -357,7 +357,7 @@ func (h *IssueHandler) FindAllByDate(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("created between ? and ?", frm, to).Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("created between ? and adddate(?, interval 1 DAY)", frm, to).Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
