@@ -76,7 +76,7 @@ func main() {
 	issueGroup := r.Group("/issue")
 	{
 		issueGroup.GET(("/findbyid/:token/:id"), issue.FindById)
-		issueGroup.GET(("/findtoday/:token"), issue.FindToday)
+		issueGroup.GET(("/findtoday/:token/:frmdate"), issue.FindToday)
 		issueGroup.GET(("/findbydate/:token/:frmdate/:todate"), issue.FindByDate)
 		issueGroup.GET(("/findallbydate/:token/:frmdate/:todate"), issue.FindAllByDate)
 		issueGroup.GET(("/findonprocess/:token"), issue.FindOnProcess)
