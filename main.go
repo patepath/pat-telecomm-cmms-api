@@ -96,5 +96,5 @@ func main() {
 		profilegroup.POST(("/save"), profile.Save)
 	}
 
-	r.Run(":8082")
+	r.Run("localhost:8082")
 }
