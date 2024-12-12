@@ -274,7 +274,7 @@ func (h *IssueHandler) FindByDate(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("status=1 and created between ? and ?", frm, to).Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("status=1 and created between ? and adddate(?, interval 1 DAY)", frm, to).Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
@@ -382,7 +382,7 @@ func (h *IssueHandler) SummaryByDate(c *gin.Context) {
 				sum(case when status = 2 then  1 else 0 end) as waitforclosed,
 				sum(case when status = 99 then  1 else 0 end) as cancelled
 			from issues 
-			where DATE(created) between ? and ?
+			where DATE(created) between ? and adddate(?, interval 1 DAY)
 			group by issue_type; 
 		`
 
