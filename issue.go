@@ -290,7 +290,7 @@ func (h *IssueHandler) FindToday(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("date(created) = date(now()) and status=0").Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("date(created) = date(now())").Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
