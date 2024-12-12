@@ -281,6 +281,7 @@ func (h *IssueHandler) FindByDate(c *gin.Context) {
 
 func (h *IssueHandler) FindToday(c *gin.Context) {
 	var t = c.Param("token")
+	var frmdate = c.Param("frmdate")
 
 	var claim, err = token.VerifyToken(t)
 	if err != nil {
@@ -290,7 +291,7 @@ func (h *IssueHandler) FindToday(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Where("date(created) = date(now()) and status=0").Find(&issues)
+		h.DB.Model(&Issue{}).Preload("Phone").Where("date(created) = ?", frmdate).Find(&issues)
 		c.JSON(http.StatusOK, issues)
 	}
 }
