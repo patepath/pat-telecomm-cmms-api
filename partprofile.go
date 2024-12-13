@@ -3,6 +3,7 @@ package main
 import (
 	"cmms-api/token"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -12,22 +13,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type Part struct {
-	IssueId       uint64 `json:"issueid" gorm:"primaryKey"`
-	PartProfileId uint64 `json:"partprofileid" gorm:"primaryKey"`
-	Rank          int    `json:"rank"`
-	Code          string `json:"code" gorm:"size:15"`
-	Name          string `json:"name" gorm:"size:255"`
-	Unit          string `json:"unit" gorm:"size:15"`
-	Qty           int    `json:"qty"`
-	Remark        string `json:"remark" gorm:"size:255"`
+type PartProfile struct {
+	Id   int64  `json:"id" gorm:"primaryKey;autoIncrement"`
+	Rank int    `json:"rank"`
+	Code string `json:"code" gorm:"size:15"`
+	Name string `json:"name" gorm:"size:255"`
+	Unit string `json:"unit" gorm:"size:15"`
 }
 
-type PartHandler struct {
+type PartProfileHandler struct {
 	DB *gorm.DB
 }
 
-func (h *PartHandler) Initialize(dsn string) {
+func (h *PartProfileHandler) Initialize(dsn string) {
 	var err error
 	var db *gorm.DB
 
@@ -35,22 +33,23 @@ func (h *PartHandler) Initialize(dsn string) {
 		log.Panic(err)
 	}
 
-	db.AutoMigrate(&Part{})
+	db.AutoMigrate(&PartProfile{})
 	h.DB = db
 }
 
-func (h *PartHandler) FindAll(c *gin.Context) {
-	var parts []Part
+func (h *PartProfileHandler) FindAll(c *gin.Context) {
+	var partprofiles []PartProfile
 
-	err := h.DB.Order("rank ASC").Find(&parts).Error
+	err := h.DB.Order("rank ASC").Find(&partprofiles).Error
 	if err != nil {
 		log.Panic(err)
 	}
 
-	c.JSON(http.StatusOK, parts)
+	c.JSON(http.StatusOK, partprofiles)
 }
 
-func (h *PartHandler) Save(c *gin.Context) {
+func (h *PartProfileHandler) Save(c *gin.Context) {
+
 	var t = c.Param("token")
 	var claim, err = token.VerifyToken(t)
 	if err != nil {
@@ -64,11 +63,13 @@ func (h *PartHandler) Save(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Position == "admin" {
-		var part Part
-		json.Unmarshal(body, &part)
+	if claim.Role == 1 {
+		var partprofile PartProfile
+		json.Unmarshal(body, &partprofile)
 
-		err := h.DB.Save(&part).Error
+		fmt.Printf("%v", partprofile)
+
+		err := h.DB.Save(&partprofile).Error
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false})
 			log.Panic(err)

@@ -25,20 +25,20 @@ type Issue struct {
 	PhoneId          uint64
 	Phone            Phone `gorm:"foreignKey:PhoneId" json:"phone"`
 	TechId           *uint64
-	Tech             User         `gorm:"foreignKey:TechId" json:"tech"`
-	Created          time.Time    `json:"created"`
-	IssueType        int          `json:"issuetype"`
-	IssueTypeOther   string       `json:"issuetypeother"`
-	IssueBy          string       `json:"issueby"`
-	IssueContactNo   string       `json:"issuecontactno"`
-	IssueDescription string       `json:"issuedescription"`
-	IssueCause       string       `json:"issuecause"`
-	IssueSolution    string       `json:"issuesolution"`
-	EngineerCode     string       `json:"engineercode"`
-	Ext              string       `json:"ext"`
-	FinishedDate     time.Time    `json:"finisheddate"`
-	Status           int          `json:"status"`
-	PartUsages       []*PartUsage `json:"partusages" gorm:"foreignKey:IssueId;"`
+	Tech             User      `gorm:"foreignKey:TechId" json:"tech"`
+	Created          time.Time `json:"created"`
+	IssueType        int       `json:"issuetype"`
+	IssueTypeOther   string    `json:"issuetypeother"`
+	IssueBy          string    `json:"issueby"`
+	IssueContactNo   string    `json:"issuecontactno"`
+	IssueDescription string    `json:"issuedescription"`
+	IssueCause       string    `json:"issuecause"`
+	IssueSolution    string    `json:"issuesolution"`
+	EngineerCode     string    `json:"engineercode"`
+	Ext              string    `json:"ext"`
+	FinishedDate     time.Time `json:"finisheddate"`
+	Status           int       `json:"status"`
+	Parts            []*Part   `json:"part" gorm:"foreignKey:IssueId;"`
 }
 
 type FileAttach struct {
@@ -220,8 +220,8 @@ func (h *IssueHandler) Save(c *gin.Context) {
 		if isparts == "true" {
 			h.DB.Where("issue_id=?", issue.Id).Delete(&PartUsage{})
 
-			if len(issue.PartUsages) > 0 {
-				h.DB.Save(&issue.PartUsages)
+			if len(issue.Parts) > 0 {
+				h.DB.Save(&issue.Parts)
 			}
 		}
 

@@ -36,43 +36,22 @@ func main() {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
-	h := LoginHandler{}
-	h.Initialize(dsn)
-
-	part := PartHandler{}
-	part.Initialize(dsn)
-
-	phone := PhoneHandler{}
-	phone.Initialize(dsn)
-
-	issue := IssueHandler{}
-	issue.Initialize(dsn)
-
-	r.POST("/login", h.Login)
-	r.GET("/checktoken/:token", h.CheckToken)
+	login := LoginHandler{}
+	login.Initialize(dsn)
+	r.POST("/login", login.Login)
+	r.GET("/checktoken/:token", login.CheckToken)
 
 	userGroup := r.Group("/user")
 	{
-		userGroup.GET("/findall/:token", h.FindAll)
-		userGroup.GET("/gettech/:token", h.GetTech)
-		userGroup.POST("/add", h.Add)
-		userGroup.POST("/save/:token", h.Save)
-		userGroup.POST("/changepassword/:token", h.ChangePassword)
+		userGroup.GET("/findall/:token", login.FindAll)
+		userGroup.GET("/gettech/:token", login.GetTech)
+		userGroup.POST("/add", login.Add)
+		userGroup.POST("/save/:token", login.Save)
+		userGroup.POST("/changepassword/:token", login.ChangePassword)
 	}
 
-	partGroup := r.Group("/part")
-	{
-		partGroup.GET("/findall", part.FindAll)
-		partGroup.POST("/save/:token", part.Save)
-	}
-
-	phoneGroup := r.Group("phone")
-	{
-		phoneGroup.GET("/findall", phone.FindAll)
-		phoneGroup.GET("/findbynumber/:num", phone.FindByNumber)
-		phoneGroup.POST("/save/:token", phone.Save)
-	}
-
+	issue := IssueHandler{}
+	issue.Initialize(dsn)
 	issueGroup := r.Group("/issue")
 	{
 		issueGroup.GET(("/findbyid/:token/:id"), issue.FindById)
@@ -89,6 +68,31 @@ func main() {
 		issueGroup.GET(("/download/:issueno/:order"), issue.Download)
 	}
 
+	phone := PhoneHandler{}
+	phone.Initialize(dsn)
+	phoneGroup := r.Group("phone")
+	{
+		phoneGroup.GET("/findall", phone.FindAll)
+		phoneGroup.GET("/findbynumber/:num", phone.FindByNumber)
+		phoneGroup.POST("/save/:token", phone.Save)
+	}
+
+	part := PartHandler{}
+	part.Initialize(dsn)
+	partGroup := r.Group("/part")
+	{
+		partGroup.GET("/findall", part.FindAll)
+		partGroup.POST("/save/:token", part.Save)
+	}
+
+	partprofile := PartProfileHandler{}
+	partprofile.Initialize(dsn)
+	partprofileGroup := r.Group("/partprofile")
+	{
+		partprofileGroup.GET("/findall", partprofile.FindAll)
+		partprofileGroup.POST("/save/:token", partprofile.Save)
+	}
+
 	profile := ProfileHandle{}
 	profilegroup := r.Group("/profile")
 	{
@@ -96,5 +100,5 @@ func main() {
 		profilegroup.POST(("/save"), profile.Save)
 	}
 
-	r.Run("192.168.0.10:8082")
+	r.Run(":8082")
 }
