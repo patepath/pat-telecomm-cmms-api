@@ -256,7 +256,7 @@ func (h *IssueHandler) FindById(c *gin.Context) {
 	if claim.Role == 1 || claim.Role == 2 {
 		var issue Issue
 
-		h.DB.Model(&Issue{}).Preload("Phone").Preload("Tech").Preload("PartUsages").Find(&Issue{}, id).First(&issue)
+		h.DB.Model(&Issue{}).Preload("Phone").Preload("Tech").Preload("Parts").Find(&Issue{}, id).First(&issue)
 		c.JSON(http.StatusOK, issue)
 	}
 }
