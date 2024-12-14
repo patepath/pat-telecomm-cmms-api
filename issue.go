@@ -24,7 +24,7 @@ type Issue struct {
 	IssueNo          string `gorm:"size:20" json:"issueno"`
 	PhoneId          uint64
 	Phone            Phone `gorm:"foreignKey:PhoneId" json:"phone"`
-	TechId           *uint64
+	TechId           uint64
 	Tech             User      `gorm:"foreignKey:TechId" json:"tech"`
 	Created          time.Time `json:"created"`
 	IssueType        int       `json:"issuetype"`
@@ -38,7 +38,7 @@ type Issue struct {
 	Ext              string    `json:"ext"`
 	FinishedDate     time.Time `json:"finisheddate"`
 	Status           int       `json:"status"`
-	Parts            []*Part   `json:"part" gorm:"foreignKey:IssueId;"`
+	Parts            []Part    `json:"parts" gorm:"foreignKey:IssueId;"`
 }
 
 type FileAttach struct {
@@ -48,22 +48,22 @@ type FileAttach struct {
 	B64      string `json:"b64"`
 }
 
-type IssuePart struct {
-	IssueId uint64 `gorm:"primaryKey"`
-	PartId  uint64 `gorm:"primaryKey"`
-	Qty     uint
-}
+//type IssuePart struct {
+//	IssueId uint64 `gorm:"primaryKey"`
+//	PartId  uint64 `gorm:"primaryKey"`
+//	Qty     uint
+//}
 
-type PartUsage struct {
-	IssueId uint64 `gorm:"primaryKey" json:"issueid"`
-	PartId  uint64 `gorm:"primaryKey" json:"partid"`
-	Rank    int    `json:"rank"`
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Qty     int    `json:"qty"`
-	Unit    string `json:"unit"`
-	Remark  string `json:"remark"`
-}
+//type PartUsage struct {
+//	IssueId uint64 `gorm:"primaryKey" json:"issueid"`
+//	PartId  uint64 `gorm:"primaryKey" json:"partid"`
+//	Rank    int    `json:"rank"`
+//	Code    string `json:"code"`
+//	Name    string `json:"name"`
+//	Qty     int    `json:"qty"`
+//	Unit    string `json:"unit"`
+//	Remark  string `json:"remark"`
+//}
 
 type ReportBySummary struct {
 	IssueType     string `json:"issue_type"`
@@ -85,7 +85,7 @@ func (h *IssueHandler) Initialize(dsn string) {
 		log.Panic(err)
 	}
 
-	db.AutoMigrate(&Issue{}, &FileAttach{}, &IssuePart{}, &PartUsage{})
+	db.AutoMigrate(&Issue{}, &FileAttach{})
 	h.DB = db
 }
 
@@ -181,7 +181,6 @@ func (h *IssueHandler) Download(c *gin.Context) {
 func (h *IssueHandler) Save(c *gin.Context) {
 	var t = c.Param("token")
 	var isattach = c.Param("isattach")
-	var isparts = c.Param("isparts")
 
 	var claim, err = token.VerifyToken(t)
 	if err != nil {
@@ -214,16 +213,9 @@ func (h *IssueHandler) Save(c *gin.Context) {
 			}
 		}
 
+		h.DB.Where("issue_id=?", issue.Id).Delete(&Part{})
 		h.DB.Save(&issue)
 		h.DB.Save(&issue.Phone)
-
-		if isparts == "true" {
-			h.DB.Where("issue_id=?", issue.Id).Delete(&PartUsage{})
-
-			if len(issue.Parts) > 0 {
-				h.DB.Save(&issue.Parts)
-			}
-		}
 
 		if isattach == "true" {
 			year := strings.Split(issue.IssueNo, "-")[0]
