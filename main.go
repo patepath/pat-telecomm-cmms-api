@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -25,6 +26,8 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func main() {
+	fmt.Println("Start...")
+
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Panic(err)
@@ -100,5 +103,14 @@ func main() {
 		profilegroup.POST(("/save"), profile.Save)
 	}
 
-	r.Run("192.168.0.10:8082")
+	operator := OperatorHandler{}
+	operator.Initialize(dsn)
+	operatorGroup := r.Group("/operator")
+	{
+		operatorGroup.GET("/findall", operator.FindAll)
+		operatorGroup.POST("/save/:token", operator.Save)
+	}
+
+	//r.Run("192.168.0.10:8082")
+	r.Run("localhost:8082")
 }

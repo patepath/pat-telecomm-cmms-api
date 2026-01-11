@@ -32,6 +32,7 @@ type Issue struct {
 	IssueBy          string    `json:"issueby"`
 	IssueContactNo   string    `json:"issuecontactno"`
 	IssueDescription string    `json:"issuedescription"`
+	IssueLocation    string    `json:"issuelocation"`
 	IssueCause       string    `json:"issuecause"`
 	IssueSolution    string    `json:"issuesolution"`
 	EngineerCode     string    `json:"engineercode"`
@@ -196,6 +197,8 @@ func (h *IssueHandler) Save(c *gin.Context) {
 		var issue Issue
 		json.Unmarshal(body, &issue)
 
+		fmt.Print("%V", issue)
+
 		if issue.IssueNo == "" {
 			var s Issue
 			var count int64
@@ -245,7 +248,7 @@ func (h *IssueHandler) FindById(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 {
+	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
 		var issue Issue
 
 		h.DB.Model(&Issue{}).Preload("Phone").Preload("Tech").Preload("Parts").Find(&Issue{}, id).First(&issue)
@@ -263,7 +266,7 @@ func (h *IssueHandler) FindByDate(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 {
+	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
 		var issues []Issue
 
 		h.DB.Model(&Issue{}).Preload("Phone").Where("status=1 and created between ? and adddate(?, interval 1 DAY)", frm, to).Find(&issues)
@@ -296,7 +299,7 @@ func (h *IssueHandler) FindOnProcess(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 {
+	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
 		var issues []Issue
 
 		h.DB.Model(&Issue{}).Preload("Phone").Where("status=0").Find(&issues)
@@ -312,7 +315,7 @@ func (h *IssueHandler) FindWaitForClose(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 {
+	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
 		var issues []Issue
 
 		h.DB.Model(&Issue{}).Preload("Phone").Where("status=2").Find(&issues)
@@ -346,7 +349,7 @@ func (h *IssueHandler) FindAllByDate(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 {
+	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
 		var issues []Issue
 
 		h.DB.Model(&Issue{}).Preload("Phone").Where("created between ? and adddate(?, interval 1 DAY)", frm, to).Find(&issues)
@@ -365,7 +368,7 @@ func (h *IssueHandler) SummaryByDate(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 {
+	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
 		var sql = `
 			select 
 				issue_type, 
