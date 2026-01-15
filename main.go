@@ -111,6 +111,6 @@ func main() {
 		operatorGroup.POST("/save/:token", operator.Save)
 	}
 
-	//r.Run("192.168.0.10:8082")
-	r.Run("localhost:8082")
+	r.Run("192.168.0.10:8082")
+	//r.Run("localhost:8082")
 }

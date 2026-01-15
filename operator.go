@@ -39,7 +39,7 @@ func (h *OperatorHandler) Initialize(dsn string) {
 func (h *OperatorHandler) FindAll(c *gin.Context) {
 	var operators []Operator
 
-	err := h.DB.Order("staff_name ASC").Find(&operators).Error
+	err := h.DB.Find(&operators).Error
 	if err != nil {
 		log.Panic(err)
 	}
