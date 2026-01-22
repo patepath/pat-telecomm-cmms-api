@@ -23,7 +23,8 @@ type Issue struct {
 	Id               uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
 	IssueNo          string `gorm:"size:20" json:"issueno"`
 	PhoneId          *uint64
-	Phone            Phone `gorm:"foreignKey:PhoneId" json:"phone"`
+	Phone            Phone  `gorm:"foreignKey:PhoneId" json:"phone"`
+	PhoneBy          string `json:"phoneby"`
 	TechId           *uint64
 	Tech             User      `gorm:"foreignKey:TechId" json:"tech"`
 	Created          time.Time `json:"created"`

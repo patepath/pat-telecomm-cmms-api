@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -45,6 +46,18 @@ func (h *OperatorHandler) FindAll(c *gin.Context) {
 	}
 
 	c.JSON(200, operators)
+}
+
+func (h *OperatorHandler) FindByNumber(c *gin.Context) {
+	var num = c.Param("num")
+	var operator []Operator
+
+	err := h.DB.Where("phone_number like ?", "%"+num+"%").Order("organization").Find(&operator).Error
+	if err != nil {
+		log.Panic(err)
+	}
+
+	c.JSON(http.StatusOK, operator)
 }
 
 func (h *OperatorHandler) Save(c *gin.Context) {
