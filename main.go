@@ -112,6 +112,15 @@ func main() {
 		operatorGroup.POST("/save/:token", operator.Save)
 	}
 
+	lineswap := LineSwapHandler{}
+	lineswap.Initialize(dsn)
+	lineswapGroup := r.Group("/lineswap")
+	{
+		lineswapGroup.GET(("/findbyid/:id"), lineswap.FindById)
+		lineswapGroup.GET(("/findbydate/:frmdate/:todate"), lineswap.FindByDate)
+		lineswapGroup.GET(("/findtoday/:frmdate"), lineswap.FindToday)
+	}
+
 	//r.Run("192.168.0.10:8082")
 	r.Run("localhost:8082")
 }
