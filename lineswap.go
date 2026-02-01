@@ -1,7 +1,14 @@
 package main
 
 import (
+	"cmms-api/token"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -46,6 +53,52 @@ func (h *LineSwapHandler) Initialize(dsn string) {
 
 	db.AutoMigrate(&LineSwap{}, &FileAttach{})
 	h.DB = db
+}
+
+func (h *LineSwapHandler) Save(c *gin.Context) {
+	var t = c.Param("token")
+
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	fmt.Printf("Role: %d\n", claim.Role)
+
+	if claim.Role == 1 || claim.Role == 4 {
+		body, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		var issue LineSwap
+		json.Unmarshal(body, &issue)
+
+		fmt.Print("%V", issue)
+
+		if issue.IssueNo == "" {
+			var s Issue
+			var count int64
+
+			year, _, _ := time.Now().Date()
+			h.DB.Where("year(created)=? and issue_no <> ''", year).Order("issue_no desc").Last(&s).Count(&count)
+
+			if count == 0 {
+				issue.IssueNo = fmt.Sprintf("%d-00001", year)
+
+			} else {
+				a, _ := strconv.Atoi(strings.Split(s.IssueNo, "-")[1])
+				b := fmt.Sprintf("0000%d", a+1)
+				issue.IssueNo = fmt.Sprintf("%d-%s", year, b[len(b)-5:])
+			}
+		}
+
+		h.DB.Where("issue_id=?", issue.Id).Delete(&Part{})
+		h.DB.Save(&issue)
+		h.DB.Save(&issue.Phone)
+
+		c.JSON(http.StatusOK, gin.H{"lineswap": issue.IssueNo, "success": true})
+	}
 }
 
 func (h *LineSwapHandler) FindById(c *gin.Context) {

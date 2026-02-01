@@ -116,6 +116,7 @@ func main() {
 	lineswap.Initialize(dsn)
 	lineswapGroup := r.Group("/lineswap")
 	{
+		lineswapGroup.POST(("/save/:token"), lineswap.Save)
 		lineswapGroup.GET(("/findbyid/:id"), lineswap.FindById)
 		lineswapGroup.GET(("/findbydate/:frmdate/:todate"), lineswap.FindByDate)
 		lineswapGroup.GET(("/findtoday/:frmdate"), lineswap.FindToday)
