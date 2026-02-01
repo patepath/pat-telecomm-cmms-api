@@ -198,8 +198,6 @@ func (h *IssueHandler) Save(c *gin.Context) {
 		var issue Issue
 		json.Unmarshal(body, &issue)
 
-		fmt.Print("%V", issue)
-
 		if issue.IssueNo == "" {
 			var s Issue
 			var count int64
@@ -300,7 +298,7 @@ func (h *IssueHandler) FindOnProcess(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 2 || claim.Role == 4 {
+	if claim.Role == 1 || claim.Role == 2 {
 		var issues []Issue
 
 		h.DB.Model(&Issue{}).Preload("Phone").Where("status=0").Find(&issues)

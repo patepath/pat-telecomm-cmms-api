@@ -40,7 +40,7 @@ func (h *OperatorHandler) Initialize(dsn string) {
 func (h *OperatorHandler) FindAll(c *gin.Context) {
 	var operators []Operator
 
-	err := h.DB.Find(&operators).Error
+	err := h.DB.Where("phone_number is not null").Find(&operators).Error
 	if err != nil {
 		log.Panic(err)
 	}

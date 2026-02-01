@@ -117,11 +117,13 @@ func main() {
 	lineswapGroup := r.Group("/lineswap")
 	{
 		lineswapGroup.POST(("/save/:token"), lineswap.Save)
-		lineswapGroup.GET(("/findbyid/:id"), lineswap.FindById)
+		lineswapGroup.GET(("/findbyid/:token/:id"), lineswap.FindById)
+		lineswapGroup.GET(("/findonprocess/:token"), lineswap.FindOnProcess)
+		lineswapGroup.GET(("/findfinished/:token"), lineswap.FindFinished)
 		lineswapGroup.GET(("/findbydate/:frmdate/:todate"), lineswap.FindByDate)
 		lineswapGroup.GET(("/findtoday/:frmdate"), lineswap.FindToday)
 	}
 
-	//r.Run("192.168.0.10:8082")
-	r.Run("localhost:8082")
+	r.Run("192.168.0.10:8082")
+	//r.Run("localhost:8082")
 }

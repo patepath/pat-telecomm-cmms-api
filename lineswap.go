@@ -63,8 +63,6 @@ func (h *LineSwapHandler) Save(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	fmt.Printf("Role: %d\n", claim.Role)
-
 	if claim.Role == 1 || claim.Role == 4 {
 		body, err := io.ReadAll(c.Request.Body)
 		if err != nil {
@@ -74,10 +72,8 @@ func (h *LineSwapHandler) Save(c *gin.Context) {
 		var issue LineSwap
 		json.Unmarshal(body, &issue)
 
-		fmt.Print("%V", issue)
-
 		if issue.IssueNo == "" {
-			var s Issue
+			var s LineSwap
 			var count int64
 
 			year, _, _ := time.Now().Date()
@@ -93,7 +89,7 @@ func (h *LineSwapHandler) Save(c *gin.Context) {
 			}
 		}
 
-		h.DB.Where("issue_id=?", issue.Id).Delete(&Part{})
+		//h.DB.Where("issue_id=?", issue.Id).Delete(&Part{})
 		h.DB.Save(&issue)
 		h.DB.Save(&issue.Phone)
 
@@ -102,15 +98,24 @@ func (h *LineSwapHandler) Save(c *gin.Context) {
 }
 
 func (h *LineSwapHandler) FindById(c *gin.Context) {
-	idParam := c.Param("id")
+	var t = c.Param("token")
 
-	var lineSwap LineSwap
-	if err := h.DB.Preload("Phone").Preload("Tech").First(&lineSwap, idParam).Error; err != nil {
-		c.JSON(404, gin.H{"error": "LineSwap not found"})
-		return
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
 	}
 
-	c.JSON(200, lineSwap)
+	if claim.Role == 1 || claim.Role == 4 {
+		idParam := c.Param("id")
+
+		var lineSwap LineSwap
+		if err := h.DB.Preload("Phone").Preload("Tech").First(&lineSwap, idParam).Error; err != nil {
+			c.JSON(404, gin.H{"error": "LineSwap not found"})
+			return
+		}
+
+		c.JSON(200, lineSwap)
+	}
 }
 
 func (h *LineSwapHandler) FindByDate(c *gin.Context) {
@@ -157,4 +162,36 @@ func (h *LineSwapHandler) FindToday(c *gin.Context) {
 	}
 
 	c.JSON(200, lineSwaps)
+}
+
+func (h *LineSwapHandler) FindOnProcess(c *gin.Context) {
+	var t = c.Param("token")
+
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if claim.Role == 1 || claim.Role == 4 {
+		var issues []LineSwap
+
+		h.DB.Model(&LineSwap{}).Preload("Phone").Where("status=0").Find(&issues)
+		c.JSON(http.StatusOK, issues)
+	}
+}
+
+func (h *LineSwapHandler) FindFinished(c *gin.Context) {
+	var t = c.Param("token")
+
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if claim.Role == 1 || claim.Role == 4 {
+		var issues []LineSwap
+
+		h.DB.Model(&LineSwap{}).Preload("Phone").Where("status=0").Find(&issues)
+		c.JSON(http.StatusOK, issues)
+	}
 }

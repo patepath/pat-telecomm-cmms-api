@@ -66,7 +66,7 @@ func (h *PhoneHandler) Save(c *gin.Context) {
 func (h *PhoneHandler) FindAll(c *gin.Context) {
 	var phones []Phone
 
-	err := h.DB.Find(&phones).Error
+	err := h.DB.Where("number <> ''").Find(&phones).Error
 	if err != nil {
 		log.Panic(err)
 	}
