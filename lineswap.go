@@ -21,20 +21,11 @@ type LineSwap struct {
 	IssueNo          string    `json:"issueno" gorm:"size:20"`
 	Phone            Phone     `json:"phone" gorm:"foreignKey:PhoneId"`
 	PhoneId          *uint64   `json:"phoneid"`
-	PhoneBy          string    `json:"phoneby"`
-	Tech             User      `json:"tech" gorm:"foreignKey:TechId"`
-	TechId           *uint64   `json:"techid"`
 	Created          time.Time `json:"created"`
 	IssueType        int       `json:"issuetype"`
-	IssueTypeOther   string    `json:"issuetypeother"`
-	IssueBy          string    `json:"issueby"`
+	IssueInquiry     int       `json:"issueinquiry"`
 	IssueContactNo   string    `json:"issuecontactno"`
-	IssueLocation    string    `json:"issuelocation"`
 	IssueDescription string    `json:"issuedescription"`
-	IssueCause       string    `json:"issuecause"`
-	IssueSolution    string    `json:"issuesolution"`
-	EngineerCode     string    `json:"engineercode"`
-	Ext              string    `json:"ext"`
 	FinishedDate     time.Time `json:"finisheddate"`
 	Status           int       `json:"status"`
 }
@@ -109,7 +100,7 @@ func (h *LineSwapHandler) FindById(c *gin.Context) {
 		idParam := c.Param("id")
 
 		var lineSwap LineSwap
-		if err := h.DB.Preload("Phone").Preload("Tech").First(&lineSwap, idParam).Error; err != nil {
+		if err := h.DB.Preload("Phone").First(&lineSwap, idParam).Error; err != nil {
 			c.JSON(404, gin.H{"error": "LineSwap not found"})
 			return
 		}
