@@ -22,10 +22,12 @@ type LineSwap struct {
 	Phone            Phone     `json:"phone" gorm:"foreignKey:PhoneId"`
 	PhoneId          *uint64   `json:"phoneid"`
 	Created          time.Time `json:"created"`
+	LineType         int       `json:"linetype"`
 	IssueType        int       `json:"issuetype"`
 	IssueInquiry     int       `json:"issueinquiry"`
 	IssueContactNo   string    `json:"issuecontactno"`
 	IssueDescription string    `json:"issuedescription"`
+	IssueRemark      string    `json:"issueremark"`
 	FinishedDate     time.Time `json:"finisheddate"`
 	Status           int       `json:"status"`
 }
@@ -126,7 +128,7 @@ func (h *LineSwapHandler) FindByDate(c *gin.Context) {
 	}
 
 	var lineSwaps []LineSwap
-	if err := h.DB.Preload("Phone").Preload("Tech").Where("created BETWEEN ? AND ?", frmDate, toDate).Find(&lineSwaps).Error; err != nil {
+	if err := h.DB.Where("created BETWEEN ? AND ?", frmDate, toDate).Find(&lineSwaps).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Database error"})
 		return
 	}
