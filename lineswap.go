@@ -56,7 +56,7 @@ func (h *LineSwapHandler) Save(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 4 {
+	if claim.Role == 1 || claim.Role == 4 || claim.Role == 5 {
 		body, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			log.Panic(err)
@@ -82,7 +82,6 @@ func (h *LineSwapHandler) Save(c *gin.Context) {
 			}
 		}
 
-		//h.DB.Where("issue_id=?", issue.Id).Delete(&Part{})
 		h.DB.Save(&issue)
 		h.DB.Save(&issue.Phone)
 
@@ -98,7 +97,7 @@ func (h *LineSwapHandler) FindById(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 4 {
+	if claim.Role == 1 || claim.Role == 4 || claim.Role == 5 {
 		idParam := c.Param("id")
 
 		var lineSwap LineSwap
@@ -137,19 +136,10 @@ func (h *LineSwapHandler) FindByDate(c *gin.Context) {
 }
 
 func (h *LineSwapHandler) FindToday(c *gin.Context) {
-	frmDateParam := c.Param("frmdate")
-
-	frmDate, err := time.Parse("2006-01-02", frmDateParam)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid date"})
-		return
-	}
-
-	startOfDay := frmDate
-	endOfDay := frmDate.Add(24 * time.Hour)
-
 	var lineSwaps []LineSwap
-	if err := h.DB.Preload("Phone").Preload("Tech").Where("created BETWEEN ? AND ?", startOfDay, endOfDay).Find(&lineSwaps).Error; err != nil {
+
+	//if err := h.DB.Preload("Phone").Preload("Tech").Where("created BETWEEN ? AND ?", startOfDay, endOfDay).Find(&lineSwaps).Error; err != nil {
+	if err := h.DB.Preload("Phone").Where("DATE(created) = CURDATE()").Find(&lineSwaps).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Database error"})
 		return
 	}
@@ -165,7 +155,7 @@ func (h *LineSwapHandler) FindOnProcess(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 4 {
+	if claim.Role == 1 || claim.Role == 4 || claim.Role == 5 {
 		var issues []LineSwap
 
 		h.DB.Model(&LineSwap{}).Preload("Phone").Where("status=0").Find(&issues)
@@ -181,7 +171,7 @@ func (h *LineSwapHandler) FindFinished(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	if claim.Role == 1 || claim.Role == 4 {
+	if claim.Role == 1 || claim.Role == 4 || claim.Role == 5 {
 		var issues []LineSwap
 
 		h.DB.Model(&LineSwap{}).Preload("Phone").Where("status=0").Find(&issues)
