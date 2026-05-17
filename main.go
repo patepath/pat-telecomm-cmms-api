@@ -124,6 +124,6 @@ func main() {
 		lineswapGroup.GET(("/findtoday/:frmdate"), lineswap.FindToday)
 	}
 
-	r.Run("192.168.0.10:8082")
-	//r.Run("localhost:8082")
+	//r.Run("192.168.0.10:8082")
+	r.Run("localhost:8082")
 }
