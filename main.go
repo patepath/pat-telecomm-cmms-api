@@ -122,6 +122,7 @@ func main() {
 		lineswapGroup.GET(("/findfinished/:token"), lineswap.FindFinished)
 		lineswapGroup.GET(("/findbydate/:frmdate/:todate"), lineswap.FindByDate)
 		lineswapGroup.GET(("/findtoday"), lineswap.FindToday)
+		lineswapGroup.GET(("/finddaily/:token/:date"), lineswap.FindDaily)
 	}
 
 	r.Run("192.168.0.10:8082")

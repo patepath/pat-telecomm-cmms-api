@@ -178,3 +178,21 @@ func (h *LineSwapHandler) FindFinished(c *gin.Context) {
 		c.JSON(http.StatusOK, issues)
 	}
 }
+
+func (h *LineSwapHandler) FindDaily(c *gin.Context) {
+	var t = c.Param("token")
+
+	var claim, err = token.VerifyToken(t)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if claim.Role == 1 || claim.Role == 4 || claim.Role == 5 {
+		var dateParam = c.Param("date")
+
+		var issues []LineSwap
+
+		h.DB.Model(&LineSwap{}).Preload("Phone").Where("DATE(created) = ?", dateParam).Find(&issues)
+		c.JSON(http.StatusOK, issues)
+	}
+}
